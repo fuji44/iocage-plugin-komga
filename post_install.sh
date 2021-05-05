@@ -2,7 +2,6 @@
 
 # Install komga
 : ${komga_app_dir="/usr/local/komga"}
-mkdir $komga_app_dir
 cd $komga_app_dir
 fetch -o release-latest.json https://api.github.com/repos/gotson/komga/releases/latest
 jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs curl -sLJO
