@@ -38,3 +38,7 @@ To increase the upper limit of memory used by java, do the following. This will 
 ```
 sysrc komga_java_opts="-Xmx4g"
 ```
+
+## Upgrade
+
+You can easily upgrade by running `/usr/local/komga/upgrade.sh`.
