@@ -1,0 +1,13 @@
+# See: https://komga.org/installation/configuration.html
+komga:
+  remember-me:
+    key: changeMe!
+    validity: 2592000
+  database:
+    file: /usr/local/komga/database.sqlite
+server:
+  port: 8080
+logging:
+  file:
+    name: /usr/local/komga/komga.log
+    max-history: 5
