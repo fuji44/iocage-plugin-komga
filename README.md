@@ -33,7 +33,7 @@ service komga restart
 
 ### [Increase memory limit](https://komga.org/installation/jar.html#increase-memory-limit)
 
-To increase the upper limit of memory used by java, do the following. This will be passed to the java command executed by rc script (`/usr/local/etc/rc.d/komga`).
+To increase the upper limit of memory used by java, do the following. This will be passed to the java command executed by rc script (`/usr/local/etc/rc.d/komga`). If you want to specify multiple options, separate them with a space.
 
 ```
 sysrc komga_java_opts="-Xmx4g"
