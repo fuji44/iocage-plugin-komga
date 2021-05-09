@@ -1,7 +1,5 @@
 #!/bin/sh
 
-service komga stop
-
 # Install komga
 : ${komga_app_dir="/usr/local/komga"}
 cd $komga_app_dir
@@ -12,4 +10,4 @@ jq '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.js
 
 chown -R komga $komga_app_dir
 
-service komga start
+service komga restart
