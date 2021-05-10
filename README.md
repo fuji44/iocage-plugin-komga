@@ -6,7 +6,7 @@ https://komga.org/
 ## Installation
 
 ```
-sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git --branch main ip4_addr="em0|192.168.0.100/24"
+sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git ip4_addr="em0|192.168.0.100/24"
 ```
 
 ## Usege
@@ -39,6 +39,10 @@ To increase the upper limit of memory used by java, do the following. This will 
 sysrc komga_java_opts="-Xmx4g"
 ```
 
-## Upgrade
+## Update
 
-You can easily upgrade by running `/usr/local/komga/upgrade.sh`.
+Execute `iocage update`.
+
+```
+sudo iocage update komga
+```
