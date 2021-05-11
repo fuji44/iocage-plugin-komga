@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install komga
-: "${komga_app_dir='/usr/local/komga'}"
+: "${komga_app_dir=/usr/local/komga}"
 cd $komga_app_dir || { echo "Komga app dir not found."; exit 1; }
 mv -f release-latest.json release-previous.json
 fetch -qo release-latest.json https://api.github.com/repos/gotson/komga/releases/latest

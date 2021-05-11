@@ -1,9 +1,8 @@
 #!/bin/sh
 
 # Install komga
-: "${komga_app_dir='/usr/local/komga'}"
-# shellcheck disable=SC2164
-cd $komga_app_dir
+: "${komga_app_dir=/usr/local/komga}"
+cd $komga_app_dir || { echo "Komga app dir not found."; exit 1; }
 fetch -qo release-latest.json https://api.github.com/repos/gotson/komga/releases/latest
 jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs fetch -q
 jq '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json | xargs -I @ ln -s @ komga.jar
