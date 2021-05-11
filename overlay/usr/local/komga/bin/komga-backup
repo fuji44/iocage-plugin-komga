@@ -80,17 +80,14 @@ validate_params()
     fi
 
     if [ ! -d "$KOMGA_BACKUP_DEST_DIR" ]; then
-        echo "❌ Destination dir '$KOMGA_BACKUP_DEST_DIR' does not exist or is not a directory." >&2
-        exit 1
+        # If either mkdir or chown fails, an error message will be printed and you will have to exit, ignore SC2015.
+        # shellcheck disable=SC2015
+        mkdir -p $KOMGA_BACKUP_DEST_DIR && chown komga $KOMGA_BACKUP_DEST_DIR || { echo "❌ Komga backup failed." >&2 ; exit 1; }
     fi
 }
 
 main()
 {
-    if [ ! -e $KOMGA_BACKUP_DEST_DIR ] ; then
-        mkdir -p $KOMGA_BACKUP_DEST_DIR
-        chown komga $KOMGA_BACKUP_DEST_DIR
-    fi
     sqlite3 "$source_file" ".backup ${KOMGA_BACKUP_DEST_DIR}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
 }
 
