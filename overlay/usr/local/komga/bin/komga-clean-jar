@@ -38,7 +38,7 @@ parse_args()
             ;;
 
             --target|-t)
-                target_dir=$2
+                KOMGA_APP_DIR=$2
                 shift
             ;;
 
@@ -53,7 +53,7 @@ parse_args()
             ;;
 
             *)
-                echo "[ERROR] Invalid option '$1'"
+                echo "❌ Invalid option '$1'" >&2
                 usage
                 exit 1
             ;;
@@ -64,23 +64,24 @@ parse_args()
 
 init_params()
 {
-    : "${target_dir:=/usr/local/komga}"
+    : "${KOMGA_APP_DIR:=/usr/local/komga}"
     : "${keep_file_count:=3}"
 }
 
 validate_params()
 {
-    if [ ! -d $target_dir ]; then
-        echo "Destination dir '$target_dir' does not exist or is not a directory." >&2
+    if [ ! -d $KOMGA_APP_DIR ]; then
+        echo "❌ Destination dir '$KOMGA_APP_DIR' does not exist or is not a directory." >&2
         exit 1
     fi
 }
 
 main()
 {
-    find -s ${target_dir}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_APP_DIR}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
+. /usr/local/komga/.env
 parse_args "$@"
 init_params
 validate_params

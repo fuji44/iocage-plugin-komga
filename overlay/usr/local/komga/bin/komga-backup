@@ -10,7 +10,7 @@ Usage: $(basename "$0") [OPTIONS]
     -s|--source source_file  Output in the file
                              Default: /usr/local/komga/database.sqlite
     -d|--dest dest_dir       Destination directory
-                             Default: /usr/local/komga
+                             Default: /usr/local/komga/backup
     -p|--prefix prefix       Backup file prefix
                              Default: komga_database_
     -h|--help                Show usage
@@ -40,7 +40,7 @@ parse_args()
             ;;
 
             --dest|-d)
-                dest_dir=$2
+                KOMGA_BACKUP_DEST_DIR=$2
                 shift
             ;;
 
@@ -55,7 +55,7 @@ parse_args()
             ;;
 
             *)
-                echo "[ERROR] Invalid option '$1'"
+                echo "❌ Invalid option '$1'" >&2
                 usage
                 exit 1
             ;;
@@ -66,29 +66,35 @@ parse_args()
 
 init_params()
 {
-    : "${source_file:=/usr/local/komga/database.sqlite}"
-    : "${dest_dir:=/usr/local/komga}"
+    : "${KOMGA_APP_DIR:=/usr/local/komga}"
+    : "${source_file:=$KOMGA_APP_DIR/database.sqlite}"
+    : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
     : "${prefix:=komga_database_}"
 }
 
 validate_params()
 {
-    if [ ! -f $source_file ]; then
-        echo "Source file '$source_file' does not exist or is not a file." >&2
+    if [ ! -f "$source_file" ]; then
+        echo "❌ Source file '$source_file' does not exist or is not a file." >&2
         exit 1
     fi
 
-    if [ ! -d $dest_dir ]; then
-        echo "Destination dir '$dest_dir' does not exist or is not a directory." >&2
+    if [ ! -d "$KOMGA_BACKUP_DEST_DIR" ]; then
+        echo "❌ Destination dir '$KOMGA_BACKUP_DEST_DIR' does not exist or is not a directory." >&2
         exit 1
     fi
 }
 
 main()
 {
-    sqlite3 $source_file ".backup ${dest_dir}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
+    if [ ! -e $KOMGA_BACKUP_DEST_DIR ] ; then
+        mkdir -p $KOMGA_BACKUP_DEST_DIR
+        chown komga $KOMGA_BACKUP_DEST_DIR
+    fi
+    sqlite3 "$source_file" ".backup ${KOMGA_BACKUP_DEST_DIR}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
 }
 
+. /usr/local/komga/.env
 parse_args "$@"
 init_params
 validate_params

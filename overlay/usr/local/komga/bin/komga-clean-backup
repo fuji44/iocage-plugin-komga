@@ -8,7 +8,7 @@ Usage: $(basename "$0") [OPTIONS]
     Clean Komga backup database files.
   OPTIONS
     -t|--target target_dir     Target directory to clean
-                               Default: /usr/local/komga
+                               Default: /usr/local/komga/backup
     -p|--prefix prefix         Backup file prefix
                                Default: komga_database_
     -k|--keep keep_file_count  Number of generations to keep.
@@ -40,7 +40,7 @@ parse_args()
             ;;
 
             --target|-t)
-                target_dir=$2
+                KOMGA_BACKUP_DEST_DIR=$2
                 shift
             ;;
 
@@ -60,7 +60,7 @@ parse_args()
             ;;
 
             *)
-                echo "[ERROR] Invalid option '$1'"
+                echo "❌ Invalid option '$1'" >&2
                 usage
                 exit 1
             ;;
@@ -71,24 +71,25 @@ parse_args()
 
 init_params()
 {
-    : "${target_dir:=/usr/local/komga}"
+    : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
     : "${prefix:=komga_database_}"
     : "${keep_file_count:=3}"
 }
 
 validate_params()
 {
-    if [ ! -d $target_dir ]; then
-        echo "Destination dir '$target_dir' does not exist or is not a directory." >&2
+    if [ ! -d "$KOMGA_BACKUP_DEST_DIR" ]; then
+        echo "❌ Destination dir '$KOMGA_BACKUP_DEST_DIR' does not exist or is not a directory." >&2
         exit 1
     fi
 }
 
 main()
 {
-    find -s ${target_dir}/${prefix}*.sqlite 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_BACKUP_DEST_DIR}/${prefix}*.sqlite 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
+. /usr/local/komga/.env
 parse_args "$@"
 init_params
 validate_params
