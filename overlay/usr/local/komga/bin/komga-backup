@@ -1,0 +1,95 @@
+#!/bin/sh
+
+usage()
+{
+    cat <<EOS >&2
+Usage: $(basename "$0") [OPTIONS]
+  DESCRIPTION
+    Backup Komga database file.
+  OPTIONS
+    -s|--source source_file  Output in the file
+                             Default: /usr/local/komga/database.sqlite
+    -d|--dest dest_dir       Destination directory
+                             Default: /usr/local/komga
+    -p|--prefix prefix       Backup file prefix
+                             Default: komga_database_
+    -h|--help                Show usage
+    --debug                  Execute with debug mode
+  EXAMPLE
+    * Back up to the default application directory.
+      That is, make '/usr/local/komga/database.sqlite' a '/usr/local/komga/komga_database_YYYYmmddTHHMMSSTZ.sqlite' backup
+      $ $(basename "$0")
+
+    * Change the destination to '/mnt/backup'.
+      $ $(basename "$0") -d /mnt/backup
+EOS
+}
+
+parse_args()
+{
+    while [ $# -gt 0 ];
+    do
+        case $1 in
+            --debug)
+                set -x
+            ;;
+
+            --source|-s)
+                source_file=$2
+                shift
+            ;;
+
+            --dest|-d)
+                dest_dir=$2
+                shift
+            ;;
+
+            --prefix|-p)
+                prefix=$2
+                shift
+            ;;
+
+            --help|-h)
+                usage
+                exit 0
+            ;;
+
+            *)
+                echo "[ERROR] Invalid option '$1'"
+                usage
+                exit 1
+            ;;
+        esac
+        shift
+    done
+}
+
+init_params()
+{
+    : "${source_file:=/usr/local/komga/database.sqlite}"
+    : "${dest_dir:=/usr/local/komga}"
+    : "${prefix:=komga_database_}"
+}
+
+validate_params()
+{
+    if [ ! -f $source_file ]; then
+        echo "Source file '$source_file' does not exist or is not a file." >&2
+        exit 1
+    fi
+
+    if [ ! -d $dest_dir ]; then
+        echo "Destination dir '$dest_dir' does not exist or is not a directory." >&2
+        exit 1
+    fi
+}
+
+main()
+{
+    sqlite3 $source_file ".backup ${dest_dir}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
+}
+
+parse_args "$@"
+init_params
+validate_params
+main

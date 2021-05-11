@@ -1,0 +1,87 @@
+#!/bin/sh
+
+usage()
+{
+    cat <<EOS >&2
+Usage: $(basename "$0") [OPTIONS]
+  DESCRIPTION
+    Clean Komga jar files.
+  OPTIONS
+    -t|--target target_dir     Target directory to clean
+                               Default: /usr/local/komga
+    -k|--keep keep_file_count  Number of generations to keep.
+                               Default: 3
+    --dry-run                  Display the delete command without actually executing it.
+    -h|--help                  Show usage
+    --debug                    Execute with debug mode
+  EXAMPLE
+    * Run the clean with the default parameters.
+      That is, it will delete all files matching 'komga-*.jar' in '/usr/local/komga' except the latest three generations.
+      $ $(basename "$0")
+
+    * If you want to see the files to be removed without running them, try the '--dry-run' option.
+      $ $(basename "$0") --dry-run
+EOS
+}
+
+parse_args()
+{
+    while [ $# -gt 0 ];
+    do
+        case $1 in
+            --debug)
+                set -x
+            ;;
+
+            --dry-run)
+                xargs_opt='-p'
+            ;;
+
+            --target|-t)
+                target_dir=$2
+                shift
+            ;;
+
+            --keep|-k)
+                keep_file_count=$2
+                shift
+            ;;
+
+            --help|-h)
+                usage
+                exit 0
+            ;;
+
+            *)
+                echo "[ERROR] Invalid option '$1'"
+                usage
+                exit 1
+            ;;
+        esac
+        shift
+    done
+}
+
+init_params()
+{
+    : "${target_dir:=/usr/local/komga}"
+    : "${keep_file_count:=3}"
+}
+
+validate_params()
+{
+    if [ ! -d $target_dir ]; then
+        echo "Destination dir '$target_dir' does not exist or is not a directory." >&2
+        exit 1
+    fi
+}
+
+main()
+{
+    find -s ${target_dir}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+}
+
+parse_args "$@"
+init_params
+validate_params
+main
