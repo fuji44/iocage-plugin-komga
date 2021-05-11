@@ -7,7 +7,7 @@ fetch -qo release-latest.json https://api.github.com/repos/gotson/komga/releases
 jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs fetch -q
 jq '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json | xargs -I @ ln -s @ komga.jar
 
-pw useradd komga -s /bin/csh -m
+pw useradd komga -u 5469 -s /bin/csh -m
 chown -R komga $komga_app_dir
 sysrc -f /etc/rc.conf komga_enable="YES"
 
