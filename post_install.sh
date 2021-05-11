@@ -13,6 +13,8 @@ sysrc -f /etc/rc.conf komga_enable="YES"
 
 service komga start
 
-echo "✅ komga installation is complete!" > /root/PLUGIN_INFO
-echo "App dir: $komga_app_dir" >> /root/PLUGIN_INFO
-echo "Komga version: $(jq -r '.name' release-latest.json)" >> /root/PLUGIN_INFO
+{
+    echo "✅ komga installation is complete!"
+    echo "App dir: $komga_app_dir"
+    echo "Komga version: $(jq -r '.name' release-latest.json)"
+} > /root/PLUGIN_INFO

@@ -12,6 +12,8 @@ chown -R komga $komga_app_dir
 
 service komga start
 
-echo "✅ komga update is complete!" > /root/PLUGIN_INFO
-echo "App dir: $komga_app_dir" >> /root/PLUGIN_INFO
-echo "Komga version: $(jq -r '.name' release-latest.json)" >> /root/PLUGIN_INFO
+{
+    echo "✅ komga update is complete!"
+    echo "App dir: $komga_app_dir"
+    echo "Komga version: $(jq -r '.name' release-latest.json)"
+} > /root/PLUGIN_INFO
