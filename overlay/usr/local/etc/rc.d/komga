@@ -3,17 +3,18 @@
 # REQUIRE: LOGIN
 # KEYWORD: shutdown
 
+# shellcheck disable=SC1091,SC2034
 . /etc/rc.subr
 
 name="komga"
 rcvar="komga_enable"
 load_rc_config $name
 
-: ${komga_enable:="NO"}
-: ${komga_app_dir:="/usr/local/komga"}
-: ${komga_app_jar:="komga.jar"}
-: ${komga_java_opts:=""}
-: ${komga_user:="komga"}
+: "${komga_enable:=NO}"
+: "${komga_app_dir:=/usr/local/komga}"
+: "${komga_app_jar:=komga.jar}"
+: "${komga_java_opts:=}"
+: "${komga_user:=komga}"
 
 required_dirs="$komga_app_dir"
 procname="/usr/local/openjdk11-jre/bin/java"
