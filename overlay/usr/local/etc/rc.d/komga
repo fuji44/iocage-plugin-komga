@@ -3,7 +3,7 @@
 # REQUIRE: LOGIN
 # KEYWORD: shutdown
 
-# shellcheck disable=SC1091,SC2034
+# shellcheck disable=SC2034
 . /etc/rc.subr
 
 name="komga"
