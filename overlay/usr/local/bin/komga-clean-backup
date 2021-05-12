@@ -12,6 +12,8 @@ Usage: $(basename "$0") [OPTIONS]
                                Default: /usr/local/komga/backup
     -p|--prefix prefix         Backup file prefix
                                Default: komga_database_
+    -s|--suffix suffix         Backup file suffix
+                               Default: .sqlite
     -k|--keep keep_file_count  Number of generations to keep.
                                Default: 3
     --dry-run                  Display the delete command without actually executing it.
@@ -50,6 +52,11 @@ parse_args()
                 shift
             ;;
 
+            --suffix|-s)
+                KOMGA_BACKUP_SUFFIX=$2
+                shift
+            ;;
+
             --keep|-k)
                 KOMGA_BACKUP_KEEP_SIZE=$2
                 shift
@@ -74,6 +81,7 @@ init_params()
 {
     : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
     : "${KOMGA_BACKUP_PREFIX:=komga_database_}"
+    : "${KOMGA_BACKUP_SUFFIX:=.sqlite}"
     : "${KOMGA_BACKUP_KEEP_SIZE:=3}"
 }
 
@@ -87,7 +95,8 @@ validate_params()
 
 main()
 {
-    find -s ${KOMGA_BACKUP_DEST_DIR}/${KOMGA_BACKUP_PREFIX}*.sqlite 2>/dev/null | sort -r | tail -n +"$((KOMGA_BACKUP_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_BACKUP_DEST_DIR}/${KOMGA_BACKUP_PREFIX}*${KOMGA_BACKUP_SUFFIX} 2>/dev/null \
+    | sort -r | tail -n +"$((KOMGA_BACKUP_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
 . /usr/local/etc/komga-plugin.conf

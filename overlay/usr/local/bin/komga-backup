@@ -14,6 +14,12 @@ Usage: $(basename "$0") [OPTIONS]
                                 Default: /usr/local/komga/backup
     -p|--prefix prefix          Backup file prefix
                                 Default: komga_database_
+    -s|--suffix suffix          Backup file suffix
+                                If the extension of the compression format that can be interpreted
+                                by the tar command is specified, it will be compressed.
+                                Only when '.sqlite' is specified, the archiving process by the tar
+                                command will not be executed.
+                                Default: .sqlite
     -h|--help                   Show usage
     --debug                     Execute with debug mode
   EXAMPLE
@@ -50,6 +56,11 @@ parse_args()
                 shift
             ;;
 
+            --suffix|-s)
+                KOMGA_BACKUP_SUFFIX=$2
+                shift
+            ;;
+
             --help|-h)
                 usage
                 exit 0
@@ -71,6 +82,7 @@ init_params()
     : "${KOMGA_BACKUP_DB_FILE:=$KOMGA_APP_DIR/database.sqlite}"
     : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
     : "${KOMGA_BACKUP_PREFIX:=komga_database_}"
+    : "${KOMGA_BACKUP_SUFFIX:=.sqlite}"
 }
 
 validate_params()
@@ -89,7 +101,13 @@ validate_params()
 
 main()
 {
-    sqlite3 "$KOMGA_BACKUP_DB_FILE" ".backup ${KOMGA_BACKUP_DEST_DIR}/${KOMGA_BACKUP_PREFIX}$(date '+%Y%m%dT%H%M%S%z').sqlite"
+    archive_filename="${KOMGA_BACKUP_PREFIX}$(date '+%Y%m%dT%H%M%S%z')"
+    sqlite3 "$KOMGA_BACKUP_DB_FILE" ".backup /tmp/$archive_filename.sqlite"
+    if [ "$KOMGA_BACKUP_SUFFIX" = ".sqlite" ]; then
+        mv "/tmp/$archive_filename.sqlite" "$KOMGA_BACKUP_DEST_DIR"
+        return
+    fi
+    tar --cd "/tmp" -acf "$KOMGA_BACKUP_DEST_DIR/$archive_filename$KOMGA_BACKUP_SUFFIX" "$archive_filename.sqlite"
 }
 
 . /usr/local/etc/komga-plugin.conf
