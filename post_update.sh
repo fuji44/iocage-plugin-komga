@@ -5,7 +5,10 @@
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
 
 # Update komga
-komga-update || { echo "❌ Komga update failed." >&2 ; exit 1; }
+# If either backup or update fails, an error message will be printed and you will have to exit, ignore SC2015.
+# shellcheck disable=SC2015
+komga-backup && komga-clean-backup && komga-update \
+|| { echo "❌ Komga update failed." >&2 ; exit 1; }
 chown -R komga $KOMGA_APP_DIR
 
 service komga start
