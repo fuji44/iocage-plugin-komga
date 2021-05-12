@@ -1,12 +1,11 @@
 #!/bin/sh
 
-. /usr/local/komga/.env
-
+. /usr/local/etc/komga-plugin.conf
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
 
 # Install komga
 pw useradd komga -u 5469 -s /bin/csh -m
-. /usr/local/komga/bin/komga-update || { echo "❌ Komga install failed." >&2 ; exit 1; }
+komga-update || { echo "❌ Komga install failed." >&2 ; exit 1; }
 chown -R komga $KOMGA_APP_DIR
 sysrc -f /etc/rc.conf komga_enable="YES"
 

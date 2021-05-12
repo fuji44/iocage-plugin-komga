@@ -1,11 +1,11 @@
 #!/bin/sh
 
-. /usr/local/komga/.env
+. /usr/local/etc/komga-plugin.conf
 
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
 
 # Update komga
-. /usr/local/komga/bin/komga-update || { echo "❌ Komga update failed." >&2 ; exit 1; }
+komga-update || { echo "❌ Komga update failed." >&2 ; exit 1; }
 
 service komga start
 

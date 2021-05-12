@@ -8,19 +8,23 @@
 
 name="komga"
 rcvar="komga_enable"
-load_rc_config $name
 
+# load rc config
+load_rc_config $name
 : "${komga_enable:=NO}"
-: "${komga_app_dir:=/usr/local/komga}"
-: "${komga_app_jar:=komga.jar}"
-: "${komga_java_opts:=}"
 : "${komga_user:=komga}"
 
-required_dirs="$komga_app_dir"
+# load komga plugin config
+. /usr/local/etc/komga-plugin.conf
+: "${KOMGA_APP_DIR:=/usr/local/komga}"
+: "${KOMGA_APP_JAR:=komga.jar}"
+: "${KOMGA_JAVA_OPTS:=}"
+
+required_dirs="$KOMGA_APP_DIR"
 procname="/usr/local/openjdk11-jre/bin/java"
-komga_chdir="$komga_app_dir"
+komga_chdir="$KOMGA_APP_DIR"
 komga_env="LANG=en_US.UTF-8"
 command="/usr/sbin/daemon"
-command_args="-f $procname -jar $komga_java_opts $komga_app_dir/$komga_app_jar"
+command_args="-f $procname -jar $KOMGA_JAVA_OPTS $KOMGA_APP_DIR/$KOMGA_APP_JAR"
 
 run_rc_command "$1" 

@@ -91,7 +91,7 @@ main()
     sqlite3 "$source_file" ".backup ${KOMGA_BACKUP_DEST_DIR}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
 }
 
-. /usr/local/komga/.env
+. /usr/local/etc/komga-plugin.conf
 parse_args "$@"
 init_params
 validate_params

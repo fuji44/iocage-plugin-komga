@@ -1,7 +1,6 @@
 #!/bin/sh
 
-. /usr/local/komga/.env
-
+. /usr/local/etc/komga-plugin.conf
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
 
 # Install or Update komga

@@ -5,10 +5,12 @@ usage()
     cat <<EOS >&2
 Usage: $(basename "$0") [OPTIONS]
   DESCRIPTION
-    Clean Komga jar files.
+    Clean Komga backup database files.
   OPTIONS
     -t|--target target_dir     Target directory to clean
-                               Default: /usr/local/komga
+                               Default: /usr/local/komga/backup
+    -p|--prefix prefix         Backup file prefix
+                               Default: komga_database_
     -k|--keep keep_file_count  Number of generations to keep.
                                Default: 3
     --dry-run                  Display the delete command without actually executing it.
@@ -16,7 +18,7 @@ Usage: $(basename "$0") [OPTIONS]
     --debug                    Execute with debug mode
   EXAMPLE
     * Run the clean with the default parameters.
-      That is, it will delete all files matching 'komga-*.jar' in '/usr/local/komga' except the latest three generations.
+      That is, it will delete all files matching 'komga_database_*.sqlite' in '/usr/local/komga' except the latest three generations.
       $ $(basename "$0")
 
     * If you want to see the files to be removed without running them, try the '--dry-run' option.
@@ -38,7 +40,12 @@ parse_args()
             ;;
 
             --target|-t)
-                KOMGA_APP_DIR=$2
+                KOMGA_BACKUP_DEST_DIR=$2
+                shift
+            ;;
+
+            --prefix|-p)
+                prefix=$2
                 shift
             ;;
 
@@ -64,24 +71,25 @@ parse_args()
 
 init_params()
 {
-    : "${KOMGA_APP_DIR:=/usr/local/komga}"
+    : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
+    : "${prefix:=komga_database_}"
     : "${keep_file_count:=3}"
 }
 
 validate_params()
 {
-    if [ ! -d $KOMGA_APP_DIR ]; then
-        echo "❌ Destination dir '$KOMGA_APP_DIR' does not exist or is not a directory." >&2
+    if [ ! -d "$KOMGA_BACKUP_DEST_DIR" ]; then
+        echo "❌ Destination dir '$KOMGA_BACKUP_DEST_DIR' does not exist or is not a directory." >&2
         exit 1
     fi
 }
 
 main()
 {
-    find -s ${KOMGA_APP_DIR}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_BACKUP_DEST_DIR}/${prefix}*.sqlite 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
-. /usr/local/komga/.env
+. /usr/local/etc/komga-plugin.conf
 parse_args "$@"
 init_params
 validate_params
