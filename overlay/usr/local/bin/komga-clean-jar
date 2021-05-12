@@ -79,7 +79,8 @@ validate_params()
 
 main()
 {
-    find -s ${KOMGA_APP_DIR}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((KOMGA_JAR_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -Es ${KOMGA_APP_DIR} -regex "${KOMGA_APP_DIR}/komga-(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.jar" 2>/dev/null \
+    | sort -r | tail -n +"$((KOMGA_JAR_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
 . /usr/local/etc/komga-plugin.conf
