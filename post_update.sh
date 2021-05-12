@@ -6,6 +6,7 @@
 
 # Update komga
 komga-update || { echo "❌ Komga update failed." >&2 ; exit 1; }
+chown -R komga $KOMGA_APP_DIR
 
 service komga start
 
