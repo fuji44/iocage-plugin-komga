@@ -6,6 +6,7 @@ usage()
 Usage: $(basename "$0") [OPTIONS]
   DESCRIPTION
     Clean Komga jar files.
+    This command depends on a few variables in /usr/local/etc/komga-plugin.conf.
   OPTIONS
     -t|--target target_dir     Target directory to clean
                                Default: /usr/local/komga
@@ -43,7 +44,7 @@ parse_args()
             ;;
 
             --keep|-k)
-                keep_file_count=$2
+                KOMGA_JAR_KEEP_SIZE=$2
                 shift
             ;;
 
@@ -65,7 +66,7 @@ parse_args()
 init_params()
 {
     : "${KOMGA_APP_DIR:=/usr/local/komga}"
-    : "${keep_file_count:=3}"
+    : "${KOMGA_JAR_KEEP_SIZE:=3}"
 }
 
 validate_params()
@@ -78,7 +79,7 @@ validate_params()
 
 main()
 {
-    find -s ${KOMGA_APP_DIR}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_APP_DIR}/komga-*.jar 2>/dev/null | sort -r | tail -n +"$((KOMGA_JAR_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
 . /usr/local/etc/komga-plugin.conf

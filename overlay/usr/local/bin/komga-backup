@@ -6,15 +6,16 @@ usage()
 Usage: $(basename "$0") [OPTIONS]
   DESCRIPTION
     Backup Komga database file.
+    This command depends on a few variables in /usr/local/etc/komga-plugin.conf.
   OPTIONS
-    -s|--source source_file  Output in the file
-                             Default: /usr/local/komga/database.sqlite
-    -d|--dest dest_dir       Destination directory
-                             Default: /usr/local/komga/backup
-    -p|--prefix prefix       Backup file prefix
-                             Default: komga_database_
-    -h|--help                Show usage
-    --debug                  Execute with debug mode
+    -t|--target target_db_file  Target sqlite database file
+                                Default: $KOMGA_APP_DIR/database.sqlite
+    -d|--dest dest_dir          Destination directory
+                                Default: /usr/local/komga/backup
+    -p|--prefix prefix          Backup file prefix
+                                Default: komga_database_
+    -h|--help                   Show usage
+    --debug                     Execute with debug mode
   EXAMPLE
     * Back up to the default application directory.
       That is, make '/usr/local/komga/database.sqlite' a '/usr/local/komga/komga_database_YYYYmmddTHHMMSSTZ.sqlite' backup
@@ -34,8 +35,8 @@ parse_args()
                 set -x
             ;;
 
-            --source|-s)
-                source_file=$2
+            --target|-t)
+                KOMGA_BACKUP_DB_FILE=$2
                 shift
             ;;
 
@@ -45,7 +46,7 @@ parse_args()
             ;;
 
             --prefix|-p)
-                prefix=$2
+                KOMGA_BACKUP_PREFIX=$2
                 shift
             ;;
 
@@ -67,15 +68,15 @@ parse_args()
 init_params()
 {
     : "${KOMGA_APP_DIR:=/usr/local/komga}"
-    : "${source_file:=$KOMGA_APP_DIR/database.sqlite}"
+    : "${KOMGA_BACKUP_DB_FILE:=$KOMGA_APP_DIR/database.sqlite}"
     : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
-    : "${prefix:=komga_database_}"
+    : "${KOMGA_BACKUP_PREFIX:=komga_database_}"
 }
 
 validate_params()
 {
-    if [ ! -f "$source_file" ]; then
-        echo "❌ Source file '$source_file' does not exist or is not a file." >&2
+    if [ ! -f "$KOMGA_BACKUP_DB_FILE" ]; then
+        echo "❌ Source file '$KOMGA_BACKUP_DB_FILE' does not exist or is not a file." >&2
         exit 1
     fi
 
@@ -88,7 +89,7 @@ validate_params()
 
 main()
 {
-    sqlite3 "$source_file" ".backup ${KOMGA_BACKUP_DEST_DIR}/${prefix}$(date '+%Y%m%dT%H%M%S%z').sqlite"
+    sqlite3 "$KOMGA_BACKUP_DB_FILE" ".backup ${KOMGA_BACKUP_DEST_DIR}/${KOMGA_BACKUP_PREFIX}$(date '+%Y%m%dT%H%M%S%z').sqlite"
 }
 
 . /usr/local/etc/komga-plugin.conf

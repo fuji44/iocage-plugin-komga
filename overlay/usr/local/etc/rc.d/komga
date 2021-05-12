@@ -17,7 +17,7 @@ load_rc_config $name
 # load komga plugin config
 . /usr/local/etc/komga-plugin.conf
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
-: "${KOMGA_APP_JAR:=komga.jar}"
+: "${KOMGA_APP_JAR:=komga-latest.jar}"
 : "${KOMGA_JAVA_OPTS:=}"
 
 required_dirs="$KOMGA_APP_DIR"

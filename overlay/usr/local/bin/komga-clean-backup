@@ -6,6 +6,7 @@ usage()
 Usage: $(basename "$0") [OPTIONS]
   DESCRIPTION
     Clean Komga backup database files.
+    This command depends on a few variables in /usr/local/etc/komga-plugin.conf.
   OPTIONS
     -t|--target target_dir     Target directory to clean
                                Default: /usr/local/komga/backup
@@ -45,12 +46,12 @@ parse_args()
             ;;
 
             --prefix|-p)
-                prefix=$2
+                KOMGA_BACKUP_PREFIX=$2
                 shift
             ;;
 
             --keep|-k)
-                keep_file_count=$2
+                KOMGA_BACKUP_KEEP_SIZE=$2
                 shift
             ;;
 
@@ -72,8 +73,8 @@ parse_args()
 init_params()
 {
     : "${KOMGA_BACKUP_DEST_DIR:=/usr/local/komga/backup}"
-    : "${prefix:=komga_database_}"
-    : "${keep_file_count:=3}"
+    : "${KOMGA_BACKUP_PREFIX:=komga_database_}"
+    : "${KOMGA_BACKUP_KEEP_SIZE:=3}"
 }
 
 validate_params()
@@ -86,7 +87,7 @@ validate_params()
 
 main()
 {
-    find -s ${KOMGA_BACKUP_DEST_DIR}/${prefix}*.sqlite 2>/dev/null | sort -r | tail -n +"$((keep_file_count + 1))" | xargs $xargs_opt -I@ rm -f @
+    find -s ${KOMGA_BACKUP_DEST_DIR}/${KOMGA_BACKUP_PREFIX}*.sqlite 2>/dev/null | sort -r | tail -n +"$((KOMGA_BACKUP_KEEP_SIZE + 1))" | xargs $xargs_opt -I@ rm -f @
 }
 
 . /usr/local/etc/komga-plugin.conf

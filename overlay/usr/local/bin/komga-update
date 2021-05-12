@@ -1,18 +1,80 @@
 #!/bin/sh
 
+usage()
+{
+    cat <<EOS >&2
+Usage: $(basename "$0") [OPTIONS]
+  DESCRIPTION
+    Update the komga JAR file to the latest version.
+    This command will not delete the old JAR file.
+    If you want to remove it, use 'komga-clean-jar'.
+    This command depends on a few variables in /usr/local/etc/komga-plugin.conf.
+  OPTIONS
+    -h|--help  Show usage
+    --debug    Execute with debug mode
+  EXAMPLE
+    * When executed, it will retrieve the latest JAR file based on the GitHub release information.
+      At the same time, update the link for 'komga-latest.jar'.
+      $ $(basename "$0")
+EOS
+}
+
+parse_args()
+{
+    while [ $# -gt 0 ];
+    do
+        case $1 in
+            --debug)
+                set -x
+            ;;
+
+            --help|-h)
+                usage
+                exit 0
+            ;;
+
+            *)
+                echo "❌ Invalid option '$1'" >&2
+                usage
+                exit 1
+            ;;
+        esac
+        shift
+    done
+}
+
+init_params()
+{
+    : "${KOMGA_APP_DIR:=/usr/local/komga}"
+}
+
+validate_params()
+{
+    if [ ! -d $KOMGA_APP_DIR ]; then
+        echo "❌ Destination dir '$KOMGA_APP_DIR' does not exist or is not a directory." >&2
+        exit 1
+    fi
+}
+
+main()
+{
+    # Install or Update komga
+    cd $KOMGA_APP_DIR || { echo "❌ Komga app dir not found." >&2 ; exit 1; }
+    if [ -f "release-latest.json" ] ; then
+        mv -f "release-latest.json" "release-previous.json"
+    fi
+    fetch -qo "release-latest.json" https://api.github.com/repos/gotson/komga/releases/latest || { echo "❌ Komga release info fetch failed." >&2 ; exit 1; }
+    jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs fetch -q || { echo "❌ Komga jar fetch failed." >&2 ; exit 1; }
+    jar=$(jq -r '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json)
+    ln -sf "$jar" "komga-latest.jar"
+    chown komga "$jar"
+
+    echo "✅ Successful fetch Komga latest version!"
+    echo "⚠ If komga is running, please restart it."
+}
+
 . /usr/local/etc/komga-plugin.conf
-: "${KOMGA_APP_DIR:=/usr/local/komga}"
-
-# Install or Update komga
-cd $KOMGA_APP_DIR || { echo "❌ Komga app dir not found." >&2 ; exit 1; }
-if [ -f "release-latest.json" ] ; then
-    mv -f "release-latest.json" "release-previous.json"
-fi
-fetch -qo "release-latest.json" https://api.github.com/repos/gotson/komga/releases/latest || { echo "❌ Komga release info fetch failed." >&2 ; exit 1; }
-jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs fetch -q || { echo "❌ Komga jar fetch failed." >&2 ; exit 1; }
-jar=$(jq -r '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json)
-ln -sf "$jar" "komga.jar"
-chown komga "$jar"
-
-echo "✅ Successful fetch Komga latest version!"
-echo "⚠ If komga is running, please restart it."
+parse_args "$@"
+init_params
+validate_params
+main
