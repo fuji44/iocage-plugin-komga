@@ -7,7 +7,7 @@
 # Update komga
 # If either backup or update fails, an error message will be printed and you will have to exit, ignore SC2015.
 # shellcheck disable=SC2015
-komga-backup && komga-clean-backup && komga-update \
+komga-backup && komga-clean-backup && komga-update && komga-clean-jar \
 || { echo "❌ Komga update failed." >&2 ; exit 1; }
 chown -R komga $KOMGA_APP_DIR
 
