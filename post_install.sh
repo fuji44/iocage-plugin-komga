@@ -1,5 +1,6 @@
 #!/bin/sh
 
+cp /usr/local/etc/komga-plugin.conf.sample /usr/local/etc/komga-plugin.conf
 . /usr/local/etc/komga-plugin.conf
 : "${KOMGA_APP_DIR:=/usr/local/komga}"
 
@@ -8,7 +9,6 @@ pw useradd komga -u 5469 -s /bin/csh -m
 komga-update || { echo "❌ Komga install failed." >&2 ; exit 1; }
 chown -R komga $KOMGA_APP_DIR
 
-cp /usr/local/etc/komga-plugin.conf.sample /usr/local/etc/komga-plugin.conf
 sysrc -f /etc/rc.conf komga_enable="YES"
 
 service komga start
