@@ -9,7 +9,7 @@ https://komga.org/
 sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git ip4_addr="em0|192.168.0.100/24"
 ```
 
-Use VNET if necessary.
+The network options have to be changed to suit the execution environment. The following is an example of using VNET.
 ```
 sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git ip4_addr="vnet0|192.168.0.100/24" vnet=yes
 ```
