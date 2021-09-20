@@ -9,6 +9,12 @@ https://komga.org/
 sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git ip4_addr="em0|192.168.0.100/24"
 ```
 
+Use VNET if necessary.
+```
+sudo iocage fetch -P komga -n komga -g https://github.com/fuji44/iocage-fuji44-plugins.git ip4_addr="vnet0|192.168.0.100/24" vnet=yes
+```
+
+
 ## Usege
 
 After the installation is complete, go to the following URL You will need to create a user only the first time.
