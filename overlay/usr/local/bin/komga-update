@@ -65,7 +65,7 @@ main()
     fi
     fetch -qo "release-latest.json" https://api.github.com/repos/gotson/komga/releases/latest || { echo "❌ Komga release info fetch failed." >&2 ; exit 1; }
     jq '.assets[] | select(.name | test("komga.*\\.jar")) | .browser_download_url' release-latest.json | xargs fetch -q || { echo "❌ Komga jar fetch failed." >&2 ; exit 1; }
-    jar=$(jq -r '.assets[] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json)
+    jar=$(jq -r '.assets[0] | select(.name | test("komga.*\\.jar")) | .name' release-latest.json)
     ln -sf "$jar" "komga-latest.jar"
     chown komga "$jar"
 
